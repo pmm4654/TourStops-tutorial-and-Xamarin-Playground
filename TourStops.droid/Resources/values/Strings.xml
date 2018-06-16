@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">TourStops.droid</string>
+  <string name="opening_button_name">Android app biiiiitch</string>
+  <string name="PageHeader">Tailor-made Tour Stops</string>
+  <string name="TourStop1">Yo mama\'s house!</string>
+  <string name="TourStop1Button">810-6885</string>
+  <string name="TourStop2">Yo grandmama\'s house!</string>
+  <string name="TourStop2Button">810-6882</string>
+</resources>
