@@ -15,14 +15,5 @@ namespace Minimize.Api.Client.Models
         public DateTime updated_at { get; set; }
         public int category_id { get; set; }
         public byte[] image { get; set; }
-
-        public override bool Equals(object obj)
-        {
-            var other = obj as Thing;
-            if (other == null)
-                return false;
-
-            return this.id == other.id;
-        }
     }
 }
