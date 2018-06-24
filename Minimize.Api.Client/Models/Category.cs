@@ -6,6 +6,7 @@ namespace Minimize.Api.Client.Models
 {
     public class Category
     {
+        public int id { get; set; }
         public string name { get; set; }
         public int user_id { get; set; }
         public DateTime created_at { get; set; }

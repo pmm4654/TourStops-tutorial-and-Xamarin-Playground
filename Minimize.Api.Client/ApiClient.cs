@@ -1,9 +1,9 @@
 ﻿using Minimize.Api.Client.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 
 namespace Minimize.Api.Client
@@ -34,7 +34,7 @@ namespace Minimize.Api.Client
                 }, 
                 authenticate: false);
 
-            AuthorizationToken = response.AuthorizationToken;
+            AuthorizationToken = response.auth_token;
 
             return response;
         }
@@ -94,9 +94,9 @@ namespace Minimize.Api.Client
         #endregion
 
         #region Categories
-        public async Task<IEnumerable<Category>> GetCategories()
+        public async Task<List<Category>> GetCategories()
         {
-            return await GetAsync<IEnumerable<Category>>("categories");
+            return await GetAsync<List<Category>>("categories");
         }
 
         public async Task<Category> GetCategory(int id)
@@ -145,16 +145,22 @@ namespace Minimize.Api.Client
         private async Task<TResponse> PostAsJsonAsync<TResponse>(string url, object body, bool authenticate = true)
         {
             SetHeaders(authenticate);
-            
-            var response = await _client.PostAsJsonAsync(url, body);
+
+            var content = new StringContent(JsonConvert.SerializeObject(body));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var response = await _client.PostAsync(url, content);
             return await response.Content.ReadAsAsync<TResponse>();
         }
 
         private async Task<bool> PutAsJsonAsync(string url, object body, bool authenticate = true)
         {
             SetHeaders(authenticate);
-            
-            var response = await _client.PutAsJsonAsync(url, body);
+
+            var content = new StringContent(JsonConvert.SerializeObject(body));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var response = await _client.PutAsync(url, content);
             return response.StatusCode == System.Net.HttpStatusCode.NoContent;
         }
 
@@ -174,6 +180,8 @@ namespace Minimize.Api.Client
             _client.DefaultRequestHeaders.Accept.Add(
                 new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(
                     "application/json"));
+
+            _client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             if (authenticate)
                 _client.DefaultRequestHeaders.Authorization = 

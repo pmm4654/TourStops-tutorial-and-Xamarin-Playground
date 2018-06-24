@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Minimize.Api.Client.Tests
@@ -15,45 +16,50 @@ namespace Minimize.Api.Client.Tests
         {
             client = new ApiClient();
 
-            //string testEmail = $"csharp.integrationtests.{DateTime.Now.ToString("yyyyMMddhhmmss")}@test.com";
+            string testEmail = $"csharp.integrationtests.{DateTime.Now.ToString("yyyyMMddhhmmss")}@test.com";
 
-            //var signupResponse = client.Signup(new Models.SignupRequest
-            //{
-            //    email = testEmail,
-            //    first_name = "integration",
-            //    last_name = "tests",
-            //    password = "Password123",
-            //    password_confirmation = "Password123"
-            //}).Result;
+            var signupResponse = client.Signup(new Models.SignupRequest
+            {
+                email = testEmail,
+                first_name = "integration",
+                last_name = "tests",
+                password = "Password123",
+                password_confirmation = "Password123"
+            }).Result;
 
-            //Assert.IsNotNull(signupResponse.AuthorizationToken, signupResponse.message);
+            Assert.IsNotNull(signupResponse.auth_token, signupResponse.message);
 
-            //var loginResponse = client.Login(new Models.LoginRequest
-            //{
-            //    email = "marco.fatica@gmail.com",
-            //    password = "deeznuts"
-            //}).Result;
+            var loginResponse = client.Login(new Models.LoginRequest
+            {
+                email = "marco.fatica@gmail.com",
+                password = "deeznuts"
+            }).Result;
 
-            client.AuthorizationToken = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxMSwiZXhwIjoxNTI5ODg4ODE2fQ.SA4VlUah2xLNpG1YJyjBzJrDXUwvqutzuUzCZtgqV1Q";
-            
+            CleanThings();
+            CleanCategories();
+        }
+
+        [ClassCleanup]
+        public static void Cleanup()
+        {
+            CleanThings();
+            CleanCategories();
         }
 
         [TestMethod]
-        public async Task Things_CRUDMethods()
+        public void Things_CRUDMethods()
         {
-            CleanThings();
-            
             var mything = new Models.Thing
             {
                 title = "my first thing",
                 category_id = 10
             };
 
-            var createdThing = await client.PostThing(mything);
+            var createdThing = client.PostThing(mything).Result;
 
             AssertThings(mything, createdThing);
 
-            var gotThing = await client.GetThing(createdThing.id);
+            var gotThing = client.GetThing(createdThing.id).Result;
 
             AssertThings(mything, gotThing);
 
@@ -63,31 +69,75 @@ namespace Minimize.Api.Client.Tests
                 category_id = 20
             };
 
-            var wasUpdated = await client.PutThing(gotThing.id, newThing);
+            Assert.IsTrue(client.PutThing(gotThing.id, newThing).Result);
+
+            var gotUpdatedThing = client.GetThing(createdThing.id).Result;
+
+            AssertThings(newThing, gotUpdatedThing);
+
+            var anotherThing = client.PostThing(mything).Result;
+
+            var myThings = client.GetThings().Result;
+
+            Assert.IsTrue(myThings.Any(t => t.title == mything.title));
+            Assert.IsTrue(myThings.Any(t => t.title == gotUpdatedThing.title));
+
+            foreach (var thing in myThings)
+            {
+                Assert.IsTrue(client.DeleteThing(thing.id).Result);
+            }
+
+            var noThings = client.GetThings().Result;
+            Assert.IsTrue(noThings.Count == 0);
+        }
+
+        [TestMethod]
+        public void Categories_CRUDMethods()
+        {
+            var myCategory = new Models.Category
+            {
+                name = "my first Category",
+                threshold = 10
+            };
+
+            var createdCategory = client.PostCategory(myCategory).Result;
+
+            AssertCategories(myCategory, createdCategory);
+
+            var gotCategory = client.GetCategory(createdCategory.id).Result;
+
+            AssertCategories(myCategory, gotCategory);
+
+            var newCategory = new Models.Category
+            {
+                name = "my new Category",
+                threshold = 20
+            };
+
+            var wasUpdated = client.PutCategory(gotCategory.id, newCategory).Result;
 
             Assert.IsTrue(wasUpdated);
 
-            var gotNewThing = await client.GetThing(createdThing.id);
+            var gotUpdatedCategory = client.GetCategory(createdCategory.id).Result;
 
-            AssertThings(newThing, gotNewThing);
+            AssertCategories(newCategory, gotUpdatedCategory);
 
-            await client.PostThing(mything);
+            var anotherCategory = client.PostCategory(myCategory).Result;
 
-            var myThings = await client.GetThings();
+            var myCategories = client.GetCategories().Result;
 
-            CollectionAssert.AreEqual(
-                    new List<Models.Thing> { gotNewThing, mything },
-                    myThings);
+            Assert.IsTrue(myCategories.Any(t => t.name == myCategory.name));
+            Assert.IsTrue(myCategories.Any(t => t.name == gotUpdatedCategory.name));
 
-            foreach(var thing in myThings)
+            foreach (var Category in myCategories)
             {
-                await client.DeleteThing(thing.id);
+                Assert.IsTrue(client.DeleteCategory(Category.id).Result);
             }
 
-            var noThings = await client.GetThings();
-            Assert.IsTrue(noThings.Count == 0);
+            var noCategories = client.GetCategories().Result;
+            Assert.IsTrue(noCategories.Count == 0);
 
-            CleanThings();
+            CleanCategories();
         }
 
         private void AssertThings(Models.Thing one, Models.Thing two)
@@ -96,12 +146,27 @@ namespace Minimize.Api.Client.Tests
             Assert.AreEqual(one.category_id, two.category_id);
         }
 
-        private async void CleanThings()
+        private void AssertCategories(Models.Category one, Models.Category two)
         {
-            var things = await client.GetThings();
+            Assert.AreEqual(one.name, two.name);
+            Assert.AreEqual(one.threshold, two.threshold);
+        }
+
+        private static void CleanThings()
+        {
+            var things = client.GetThings().Result;
             foreach (var thing in things)
             {
-                await client.DeleteThing(thing.id);
+                Assert.IsTrue(client.DeleteThing(thing.id).Result);
+            }
+        }
+
+        private static void CleanCategories()
+        {
+            var categories = client.GetCategories().Result;
+            foreach (var category in categories)
+            {
+                Assert.IsTrue(client.DeleteCategory(category.id).Result);
             }
         }
     }
