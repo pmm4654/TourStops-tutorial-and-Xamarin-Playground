@@ -31,8 +31,8 @@ namespace Minimize.Api.Client.Tests
 
             var loginResponse = client.Login(new Models.LoginRequest
             {
-                email = "marco.fatica@gmail.com",
-                password = "deeznuts"
+                email = testEmail,
+                password = "Password123"
             }).Result;
 
             CleanThings();

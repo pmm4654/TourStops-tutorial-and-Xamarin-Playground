@@ -17,7 +17,7 @@ namespace Minimize.Api.Client
         public ApiClient(string BaseAddress = null)
         {
             _client = new HttpClient();
-            _client.BaseAddress = new Uri(BaseAddress ?? "https://minimize.herokuapp.com/");
+            _client.BaseAddress = new Uri(BaseAddress ?? "https://minimize.herokuapp.com");
         }
 
         public async Task<SignupResponse> Signup(SignupRequest request)
@@ -111,7 +111,6 @@ namespace Minimize.Api.Client
                 new
                 {
                     category.name,
-                    category.user_id,
                     category.threshold
                 });
         }
@@ -123,7 +122,6 @@ namespace Minimize.Api.Client
                 new
                 {
                     category.name,
-                    category.user_id,
                     category.threshold
                 });
         }
