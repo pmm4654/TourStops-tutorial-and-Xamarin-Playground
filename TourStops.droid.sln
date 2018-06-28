@@ -4,10 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TourStops.droid", "TourStops.droid\TourStops.droid.csproj", "{0CB0F47F-A1BC-40D0-B7D9-B0A2187F8EB1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4D2A9B8B-690F-49E3-A96B-24FE7281F4A7} = {4D2A9B8B-690F-49E3-A96B-24FE7281F4A7}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minimize.Api.Client", "Minimize.Api.Client\Minimize.Api.Client.csproj", "{4D2A9B8B-690F-49E3-A96B-24FE7281F4A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minimize.Api.Client", "Minimize.Api.Client\Minimize.Api.Client.csproj", "{4D2A9B8B-690F-49E3-A96B-24FE7281F4A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minimize.Api.Client.IntegrationTests", "Minimize.Api.Client.Tests\Minimize.Api.Client.IntegrationTests.csproj", "{B38A37D5-EEE4-4F5B-8848-C4947815CEB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minimize.Api.Client.IntegrationTests", "Minimize.Api.Client.Tests\Minimize.Api.Client.IntegrationTests.csproj", "{B38A37D5-EEE4-4F5B-8848-C4947815CEB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
