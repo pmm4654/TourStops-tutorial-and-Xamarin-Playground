@@ -1,6 +1,8 @@
 ﻿using Android.App;
 using Android.Widget;
 using Android.OS;
+using Minimize.Api.Client;
+
 
 namespace TourStops.droid
 {
@@ -8,7 +10,9 @@ namespace TourStops.droid
     public class MainActivity : Activity
     {
         private int currentProgress = 0;
-
+        private static ApiClient client;
+        private static Minimize.Api.Client.Models.SignupRequest signup;
+        private static Minimize.Api.Client.Models.SignupResponse signupResponse;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -87,11 +91,21 @@ namespace TourStops.droid
             progressBar.Progress = this.currentProgress += 10;
         }
 
-        private void SetupClickButton()
+        private async void SetupClickButton()
         {
             Button button = FindViewById<Button>(Resource.Id.ClickyButtonTextChanger);
-            button.Click += delegate 
+            button.Click += async delegate 
             {
+                client = new ApiClient();
+                signup  = new Minimize.Api.Client.Models.SignupRequest
+                {
+                    email = "pmm4654@gmail.com",
+                    first_name = "integration",
+                    last_name = "tests",
+                    password = "Password123",
+                    password_confirmation = "Password123"
+                };
+                signupResponse = client.Signup(signup).Result;
                 Toast.MakeText(this, "You clicked me!", ToastLength.Short).Show();
             };
         }
